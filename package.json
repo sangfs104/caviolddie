@@ -9,12 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+<<<<<<< HEAD
     "@reduxjs/toolkit": "^2.12.0",
     "lucide-react": "^1.27.0",
     "next": "^16.2.12",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-redux": "^9.3.0"
+=======
+    "next": "16.2.12",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+>>>>>>> 9978e65bf66107052d9924854091e84bcc0418a7
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
