@@ -1318,7 +1318,7 @@ const ShoppingCart = () => {
                       Mọi thắc mắc về đổi trả hoặc sản phẩm lỗi, vui lòng nhắn
                       tin trực tiếp qua Instagram{" "}
                       <a
-                        href="https://instagram.com/cavioddie"
+                        href="https://www.instagram.com/caviolddie/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="font-semibold text-blue-600 hover:underline"
