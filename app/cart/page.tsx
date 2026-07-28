@@ -408,6 +408,7 @@
 // };
 
 // export default ShoppingCart;
+
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
@@ -835,7 +836,7 @@ const ShoppingCart = () => {
                   THANH TOÁN
                 </button>
               </div>
-
+{/* 
               <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 sm:p-5 text-xs sm:text-sm">
                 <p className="font-semibold mb-1">Chính sách mua hàng:</p>
                 <p className="text-gray-700">
@@ -846,8 +847,49 @@ const ShoppingCart = () => {
                   </span>{" "}
                   trở lên.
                 </p>
-              </div>
+              </div> */}
+<div className="bg-blue-50 border border-blue-100 rounded-lg p-4 sm:p-5 text-xs sm:text-sm space-y-3">
+  <p className="font-semibold text-gray-900">Chính sách mua hàng:</p>
 
+  <div className="space-y-2.5">
+    {/* Đổi trả */}
+    <div>
+      <p className="font-medium text-gray-900">🔄 Đổi trả hàng</p>
+      <p className="text-gray-700 mt-0.5">
+        Hỗ trợ đổi size/màu trong vòng 3 ngày kể từ khi nhận hàng, sản
+        phẩm còn nguyên tem mác, chưa qua sử dụng hoặc giặt tẩy.
+      </p>
+    </div>
+
+    {/* Sản phẩm lỗi */}
+    <div>
+      <p className="font-medium text-gray-900">⚠️ Sản phẩm lỗi</p>
+      <p className="text-gray-700 mt-0.5">
+        Nếu sản phẩm bị lỗi do nhà sản xuất (đường may, form dáng, chất
+        vải...), vui lòng chụp ảnh/quay video tình trạng sản phẩm và
+        liên hệ ngay để được đổi mới miễn phí.
+      </p>
+    </div>
+
+    {/* Liên hệ */}
+    <div>
+      <p className="font-medium text-gray-900">📩 Liên hệ hỗ trợ</p>
+      <p className="text-gray-700 mt-0.5">
+        Mọi thắc mắc về đổi trả hoặc sản phẩm lỗi, vui lòng nhắn tin
+        trực tiếp qua Instagram{" "}
+        
+          href="https://instagram.com/cavioddie"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-blue-600 hover:underline"
+        >
+          @cavioddie
+        </a>{" "}
+        để được hỗ trợ nhanh nhất.
+      </p>
+    </div>
+  </div>
+</div>
               <div className="border border-gray-200 rounded-lg p-4 sm:p-5">
                 <p className="font-semibold text-xs sm:text-sm">
                   Khuyến mãi dành cho bạn
