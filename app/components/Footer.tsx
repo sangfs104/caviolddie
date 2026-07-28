@@ -6,7 +6,7 @@ const Footer = () => {
   return (
     <footer className="border-t border-black bg-white px-8 py-4 flex justify-between items-center">
       <p className="text-sm text-gray-500">
-        © 2025, GNAS WORLDWIDE —{" "}
+        © 2026, CAVIOLDDIE —{" "}
         <Link href="/privacy-policy" className="underline text-gray-500">
           Privacy policy
         </Link>
