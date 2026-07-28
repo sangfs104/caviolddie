@@ -531,15 +531,15 @@ function mapApiProductToProduct(apiProduct: ApiProduct): Product {
   // ✅ Chọn biến thể có giá cuối cùng (discountPrice ?? price) thấp nhất
   // để làm đại diện hiển thị cho sản phẩm — đảm bảo giá gốc & giá giảm
   // luôn thuộc CÙNG một biến thể, tránh lệch dữ liệu.
-  let cheapestVariant: ApiVariant | null = null;
-  let cheapestFinalPrice = Infinity;
-  variants.forEach((v) => {
-    const finalPrice = v.discountPrice ?? v.price;
-    if (finalPrice < cheapestFinalPrice) {
-      cheapestFinalPrice = finalPrice;
-      cheapestVariant = v;
-    }
-  });
+  // (Dùng reduce thay vì let+forEach để tránh TS narrow sai kiểu qua closure)
+  const cheapestVariant: ApiVariant | null = variants.reduce<ApiVariant | null>(
+    (best, current) => {
+      const currentFinal = current.discountPrice ?? current.price;
+      const bestFinal = best ? (best.discountPrice ?? best.price) : Infinity;
+      return currentFinal < bestFinal ? current : best;
+    },
+    null,
+  );
 
   const price = cheapestVariant
     ? (cheapestVariant.discountPrice ?? cheapestVariant.price)
@@ -551,7 +551,8 @@ function mapApiProductToProduct(apiProduct: ApiProduct): Product {
     cheapestVariant.discountPrice < cheapestVariant.price
   );
 
-  const originalPrice = hasDiscount ? cheapestVariant!.price : null;
+  const originalPrice =
+    hasDiscount && cheapestVariant ? cheapestVariant.price : null;
 
   const soldOut = variants.length > 0 && variants.every((v) => v.stock <= 0);
 
