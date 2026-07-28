@@ -2,10 +2,11 @@
 
 // import React, { useEffect, useState } from "react";
 // import Image from "next/image";
+// import Link from "next/link";
 // import { ShoppingBag } from "lucide-react";
 // import { useDispatch, useSelector } from "react-redux";
-// import { RootState } from "../../redux/store"; // ⚠️ chỉnh lại path cho đúng cấu trúc thư mục của bạn
-// import { addToCart, refresh } from "../../redux/cartSlice"; // ⚠️ chỉnh lại path
+// import { RootState } from "../../redux/store";
+// import { addToCart, refresh } from "../../redux/cartSlice";
 // import QuickViewModal, {
 //   QuickViewProduct,
 //   AddToCartPayload,
@@ -15,8 +16,8 @@
 // interface Product extends QuickViewProduct {
 //   image: string;
 //   hoverImage?: string;
-//   rawVariants: ApiVariant[]; // giữ nguyên variants gốc để lookup khi add to cart
-//   rawImages: string[]; // giữ nguyên images gốc từ API (giống product.images bên ProductDetail)
+//   rawVariants: ApiVariant[];
+//   rawImages: string[];
 // }
 
 // interface ApiVariant {
@@ -83,7 +84,7 @@
 //     soldOut,
 //     colors,
 //     rawVariants: variants,
-//     rawImages: apiProduct.images ?? [], // ← giữ nguyên, dùng khi dispatch giống ProductDetail
+//     rawImages: apiProduct.images ?? [],
 //   };
 // }
 
@@ -103,45 +104,51 @@
 //       onMouseEnter={() => setHovered(true)}
 //       onMouseLeave={() => setHovered(false)}
 //     >
-//       <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-50">
-//         {product.soldOut && (
-//           <span className="absolute top-3 left-1/2 -translate-x-1/2 z-10 bg-gray-900 text-white text-[11px] tracking-wide px-3 py-1">
-//             Hết hàng
-//           </span>
-//         )}
+//       {/* ✅ Bọc Link quanh ảnh — bấm vào ảnh sẽ chuyển tới trang chi tiết */}
+//       <Link href={`/products/${product.id}`} className="block">
+//         <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-50 cursor-pointer">
+//           {product.soldOut && (
+//             <span className="absolute top-3 left-1/2 -translate-x-1/2 z-10 bg-gray-900 text-white text-[11px] tracking-wide px-3 py-1">
+//               Hết hàng
+//             </span>
+//           )}
 
-//         {product.image && (
-//           <Image
-//             src={product.image}
-//             alt={product.name}
-//             fill
-//             sizes="(max-width: 768px) 50vw, 20vw"
-//             className={`object-cover transition-opacity duration-300 ${
-//               product.hoverImage && hovered ? "opacity-0" : "opacity-100"
-//             }`}
-//           />
-//         )}
+//           {product.image && (
+//             <Image
+//               src={product.image}
+//               alt={product.name}
+//               fill
+//               sizes="(max-width: 768px) 50vw, 20vw"
+//               className={`object-cover transition-opacity duration-300 ${
+//                 product.hoverImage && hovered ? "opacity-0" : "opacity-100"
+//               }`}
+//             />
+//           )}
 
-//         {product.hoverImage && (
-//           <Image
-//             src={product.hoverImage}
-//             alt={product.name}
-//             fill
-//             sizes="(max-width: 768px) 50vw, 20vw"
-//             className={`object-cover transition-opacity duration-300 ${
-//               hovered ? "opacity-100" : "opacity-0"
-//             }`}
-//           />
-//         )}
-//       </div>
+//           {product.hoverImage && (
+//             <Image
+//               src={product.hoverImage}
+//               alt={product.name}
+//               fill
+//               sizes="(max-width: 768px) 50vw, 20vw"
+//               className={`object-cover transition-opacity duration-300 ${
+//                 hovered ? "opacity-100" : "opacity-0"
+//               }`}
+//             />
+//           )}
+//         </div>
+//       </Link>
 
 //       <div className="mt-3 text-[11px] text-gray-400">
 //         +{sizesCount} Kích thước
 //       </div>
 
-//       <h3 className="mt-1 text-sm font-medium text-gray-900 uppercase">
-//         {product.name}
-//       </h3>
+//       {/* ✅ Tên sản phẩm cũng bấm vào được, đồng bộ trải nghiệm */}
+//       <Link href={`/products/${product.id}`}>
+//         <h3 className="mt-1 text-sm font-medium text-gray-900 uppercase hover:underline">
+//           {product.name}
+//         </h3>
+//       </Link>
 
 //       <div className="mt-2 flex items-center justify-between">
 //         <span
@@ -154,7 +161,11 @@
 
 //         <button
 //           type="button"
-//           onClick={() => onQuickAdd(product)}
+//           onClick={(e) => {
+//             e.preventDefault();
+//             e.stopPropagation(); // ✅ Ngăn không cho nổi bọt lên Link cha
+//             onQuickAdd(product);
+//           }}
 //           disabled={product.soldOut}
 //           className={`flex items-center gap-1.5 rounded-full pl-3 pr-1 py-1 text-[11px] tracking-wide transition-colors ${
 //             product.soldOut
@@ -199,7 +210,6 @@
 //   const dispatch = useDispatch();
 //   const user = useSelector((state: RootState) => state.auth.user);
 
-//   // ==== Lấy userId / guestId — y hệt ProductDetail ====
 //   const getUserId = () => {
 //     if (typeof window !== "undefined") {
 //       const storedUser = localStorage.getItem("user");
@@ -217,7 +227,6 @@
 //     return "";
 //   };
 
-//   // ==== Merge giỏ hàng khi user đăng nhập — y hệt ProductDetail ====
 //   useEffect(() => {
 //     const mergeCart = async () => {
 //       if (!user?.id) return;
@@ -247,7 +256,6 @@
 //     mergeCart();
 //   }, [user?.id, dispatch]);
 
-//   // ==== Lấy danh sách sản phẩm từ API ====
 //   useEffect(() => {
 //     let ignore = false;
 
@@ -284,7 +292,6 @@
 //     };
 //   }, []);
 
-//   // ==== Thêm vào giỏ hàng — y hệt handleAddToCart của ProductDetail ====
 //   const handleConfirmAddToCart = async (payload: AddToCartPayload) => {
 //     const product = products.find((p) => p.id === payload.product.id);
 //     if (!product) {
@@ -341,7 +348,7 @@
 //           },
 //           variant: {
 //             ...selectedVariant,
-//             discountPrice: selectedVariant.discountPrice ?? undefined, // ← fix null → undefined
+//             discountPrice: selectedVariant.discountPrice ?? undefined,
 //           },
 //           quantity: payload.quantity,
 //         }),
@@ -365,8 +372,7 @@
 //       setAddingToCart(false);
 //     }
 //   };
-//   // ==== Lắng nghe sự kiện cart-updated — y hệt ProductDetail ====
-//   // Đảm bảo Redux (badge giỏ hàng, mini-cart...) luôn đồng bộ với backend
+
 //   useEffect(() => {
 //     const updateCart = async () => {
 //       const userId = getUserId();
@@ -472,6 +478,8 @@ interface Product extends QuickViewProduct {
   hoverImage?: string;
   rawVariants: ApiVariant[];
   rawImages: string[];
+  originalPrice: number | null;
+  hasDiscount: boolean;
 }
 
 interface ApiVariant {
@@ -520,8 +528,30 @@ function mapApiProductToProduct(apiProduct: ApiProduct): Product {
 
   const sizes = Array.from(new Set(variants.map((v) => v.size)));
 
-  const prices = variants.map((v) => v.discountPrice ?? v.price);
-  const price = prices.length > 0 ? Math.min(...prices) : 0;
+  // ✅ Chọn biến thể có giá cuối cùng (discountPrice ?? price) thấp nhất
+  // để làm đại diện hiển thị cho sản phẩm — đảm bảo giá gốc & giá giảm
+  // luôn thuộc CÙNG một biến thể, tránh lệch dữ liệu.
+  let cheapestVariant: ApiVariant | null = null;
+  let cheapestFinalPrice = Infinity;
+  variants.forEach((v) => {
+    const finalPrice = v.discountPrice ?? v.price;
+    if (finalPrice < cheapestFinalPrice) {
+      cheapestFinalPrice = finalPrice;
+      cheapestVariant = v;
+    }
+  });
+
+  const price = cheapestVariant
+    ? (cheapestVariant.discountPrice ?? cheapestVariant.price)
+    : 0;
+
+  const hasDiscount = !!(
+    cheapestVariant &&
+    cheapestVariant.discountPrice != null &&
+    cheapestVariant.discountPrice < cheapestVariant.price
+  );
+
+  const originalPrice = hasDiscount ? cheapestVariant!.price : null;
 
   const soldOut = variants.length > 0 && variants.every((v) => v.stock <= 0);
 
@@ -534,6 +564,8 @@ function mapApiProductToProduct(apiProduct: ApiProduct): Product {
     image,
     hoverImage,
     price,
+    originalPrice,
+    hasDiscount,
     sizes,
     soldOut,
     colors,
@@ -564,6 +596,19 @@ function ProductCard({
           {product.soldOut && (
             <span className="absolute top-3 left-1/2 -translate-x-1/2 z-10 bg-gray-900 text-white text-[11px] tracking-wide px-3 py-1">
               Hết hàng
+            </span>
+          )}
+
+          {/* ✅ Badge giảm giá */}
+          {!product.soldOut && product.hasDiscount && product.originalPrice && (
+            <span className="absolute top-3 left-3 z-10 bg-red-600 text-white text-[11px] font-medium tracking-wide px-2 py-1 rounded">
+              -
+              {Math.round(
+                ((product.originalPrice - product.price) /
+                  product.originalPrice) *
+                  100,
+              )}
+              %
             </span>
           )}
 
@@ -605,13 +650,25 @@ function ProductCard({
       </Link>
 
       <div className="mt-2 flex items-center justify-between">
-        <span
-          className={`text-sm ${
-            product.soldOut ? "text-gray-400" : "text-gray-900"
-          }`}
-        >
-          {product.soldOut ? "Hết hàng" : formatPrice(product.price)}
-        </span>
+        {/* ✅ Giá: nếu có giảm giá -> giá gốc gạch ngang (xám) + giá giảm (đỏ) */}
+        <div className="flex items-baseline gap-2">
+          {product.soldOut ? (
+            <span className="text-sm text-gray-400">Hết hàng</span>
+          ) : product.hasDiscount && product.originalPrice ? (
+            <>
+              <span className="text-sm font-semibold text-red-600">
+                {formatPrice(product.price)}
+              </span>
+              <span className="text-xs text-gray-400 line-through">
+                {formatPrice(product.originalPrice)}
+              </span>
+            </>
+          ) : (
+            <span className="text-sm text-gray-900">
+              {formatPrice(product.price)}
+            </span>
+          )}
+        </div>
 
         <button
           type="button"
