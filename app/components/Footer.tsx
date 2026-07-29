@@ -5,8 +5,9 @@ import { useState } from "react";
 
 const Footer = () => {
   const [email, setEmail] = useState("");
-  const [newsletterStatus, setNewsletterStatus] = useState;
-  "idle" | "loading" | "success" | ("error" > "idle");
+  const [newsletterStatus, setNewsletterStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [newsletterError, setNewsletterError] = useState("");
 
   const handleSubscribe = async (e: React.FormEvent) => {
@@ -45,8 +46,9 @@ const Footer = () => {
     phone: "",
     message: "",
   });
-  const [contactStatus, setContactStatus] = useState;
-  "idle" | "loading" | "success" | ("error" > "idle");
+  const [contactStatus, setContactStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [contactError, setContactError] = useState("");
 
   const handleContactChange = (
@@ -95,7 +97,7 @@ const Footer = () => {
       <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
         <div className="md:max-w-xs">
           <p className="text-sm text-gray-500">
-            {"\u00A9"} 2026, CAVIOLDDIE {"\u2014"}{" "}
+            © 2026, CAVIOLDDIE —{" "}
             <Link href="/privacy-policy" className="underline text-gray-500">
               Privacy policy
             </Link>
@@ -104,7 +106,7 @@ const Footer = () => {
 
         <div className="md:max-w-sm md:flex-1">
           <span className="block text-[11px] font-medium tracking-widest uppercase text-gray-400 mb-2">
-            Dang ky nhan tin
+            Đăng ký nhận tin
           </span>
 
           <form
@@ -119,7 +121,7 @@ const Footer = () => {
                 setEmail(e.target.value);
                 if (newsletterStatus !== "idle") setNewsletterStatus("idle");
               }}
-              placeholder="Nhap email cua ban"
+              placeholder="Nhập email của bạn"
               aria-label="Email"
               className="flex-1 min-w-0 px-3 py-2 text-sm outline-none placeholder:text-gray-400"
             />
@@ -128,14 +130,14 @@ const Footer = () => {
               disabled={newsletterStatus === "loading"}
               className="shrink-0 px-4 py-2 text-xs font-semibold uppercase tracking-wide bg-black text-white hover:bg-gray-800 transition-colors disabled:opacity-50"
             >
-              {newsletterStatus === "loading" ? "Dang gui..." : "Gui"}
+              {newsletterStatus === "loading" ? "Đang gửi..." : "Gửi"}
             </button>
           </form>
 
           <div className="mt-1.5 h-4">
             {newsletterStatus === "success" && (
               <p className="text-xs text-green-600">
-                Dang ky thanh cong, cam on ban!
+                Đăng ký thành công, cảm ơn bạn!
               </p>
             )}
             {newsletterStatus === "error" && (
@@ -149,7 +151,7 @@ const Footer = () => {
               onClick={() => setShowContactForm((prev) => !prev)}
               className="text-[11px] font-medium tracking-widest uppercase text-gray-400 hover:text-gray-700 transition-colors underline"
             >
-              {showContactForm ? "Dong lien he" : "Lien he / Hoi dap"}
+              {showContactForm ? "Đóng liên hệ" : "Liên hệ / Hỏi đáp"}
             </button>
 
             {showContactForm && (
@@ -161,7 +163,7 @@ const Footer = () => {
                   type="text"
                   name="name"
                   required
-                  placeholder="Ho ten"
+                  placeholder="Họ tên"
                   value={contactForm.name}
                   onChange={handleContactChange}
                   className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black placeholder:text-gray-400"
@@ -178,7 +180,7 @@ const Footer = () => {
                 <input
                   type="tel"
                   name="phone"
-                  placeholder="So dien thoai (khong bat buoc)"
+                  placeholder="Số điện thoại (không bắt buộc)"
                   value={contactForm.phone}
                   onChange={handleContactChange}
                   className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black placeholder:text-gray-400"
@@ -187,7 +189,7 @@ const Footer = () => {
                   name="message"
                   required
                   rows={3}
-                  placeholder="Noi dung can hoi..."
+                  placeholder="Nội dung cần hỏi..."
                   value={contactForm.message}
                   onChange={handleContactChange}
                   className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black resize-none placeholder:text-gray-400"
@@ -197,12 +199,12 @@ const Footer = () => {
                   disabled={contactStatus === "loading"}
                   className="w-full bg-black text-white py-2 text-xs font-semibold uppercase tracking-wide hover:bg-gray-800 transition-colors disabled:opacity-50"
                 >
-                  {contactStatus === "loading" ? "Dang gui..." : "Gui lien he"}
+                  {contactStatus === "loading" ? "Đang gửi..." : "Gửi liên hệ"}
                 </button>
 
                 {contactStatus === "success" && (
                   <p className="text-xs text-green-600">
-                    Gui thanh cong! Chung toi se phan hoi som nhat.
+                    Gửi thành công! Chúng tôi sẽ phản hồi sớm nhất.
                   </p>
                 )}
                 {contactStatus === "error" && (
