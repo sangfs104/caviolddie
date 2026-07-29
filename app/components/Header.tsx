@@ -1,17 +1,12 @@
 // "use client";
 
-// import React, { useState, useEffect } from "react";
+// import React, { useState, useEffect, useCallback } from "react";
 // import { Search, ShoppingBag, User, ChevronDown, Menu, X } from "lucide-react";
 // import Link from "next/link";
 // import { useSelector } from "react-redux";
 // import { RootState } from "../../redux/store";
 // import { useRouter } from "next/navigation";
-
-// interface CartItem {
-//   id: string | number;
-//   quantity: number;
-//   [key: string]: any;
-// }
+// import CartDrawer, { CartItem } from "./Cartdrawer";
 
 // interface CartType {
 //   items: CartItem[];
@@ -70,6 +65,8 @@
 //     name?: string;
 //   } | null>(null);
 //   const [isMenuOpen, setIsMenuOpen] = useState(false);
+//   const [isCartOpen, setIsCartOpen] = useState(false);
+//   const [updatingId, setUpdatingId] = useState<string | null>(null);
 //   const router = useRouter();
 //   const reduxUser = useSelector((state: RootState) => state.auth.user);
 
@@ -92,7 +89,7 @@
 //     return "";
 //   };
 
-//   const fetchCart = async () => {
+//   const fetchCart = useCallback(async () => {
 //     const userId = reduxUser?.id || getUserId();
 //     if (!userId) return;
 //     try {
@@ -104,11 +101,12 @@
 //       );
 //       if (!res.ok) throw new Error("Failed to fetch cart");
 //       const data = await res.json();
-//       setCart(data);
+//       setCart({ items: data.items || [] });
 //     } catch {
 //       setCart({ items: [] });
 //     }
-//   };
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [reduxUser]);
 
 //   useEffect(() => {
 //     if (typeof window !== "undefined") {
@@ -134,14 +132,93 @@
 //     // eslint-disable-next-line react-hooks/exhaustive-deps
 //   }, [reduxUser]);
 
+//   // Khoá scroll nền khi menu mobile hoặc giỏ hàng đang mở
 //   useEffect(() => {
-//     document.body.style.overflow = isMenuOpen ? "hidden" : "auto";
-//   }, [isMenuOpen]);
+//     document.body.style.overflow = isMenuOpen || isCartOpen ? "hidden" : "auto";
+//   }, [isMenuOpen, isCartOpen]);
 
 //   const cartCount = cart.items.reduce(
 //     (sum, item) => sum + (item.quantity || 0),
 //     0,
 //   );
+
+//   // Cập nhật số lượng 1 sản phẩm trong giỏ (dùng chung logic với trang /cart)
+//   const handleUpdateQuantity = async (
+//     itemId: string,
+//     productId: string,
+//     variantId: string | undefined,
+//     newQuantity: number,
+//   ) => {
+//     if (newQuantity < 1) return;
+//     const userId = reduxUser?.id || getUserId();
+//     setUpdatingId(itemId);
+
+//     setCart((prev) => ({
+//       items: prev.items.map((item) =>
+//         item._id === itemId ? { ...item, quantity: newQuantity } : item,
+//       ),
+//     }));
+
+//     try {
+//       const res = await fetch(
+//         `${process.env.NEXT_PUBLIC_API_URL}/api/cart/update`,
+//         {
+//           method: "POST",
+//           headers: { "Content-Type": "application/json" },
+//           credentials: "include",
+//           body: JSON.stringify({
+//             userId,
+//             productId,
+//             variantId,
+//             quantity: newQuantity,
+//           }),
+//         },
+//       );
+//       if (!res.ok) throw new Error("Không thể cập nhật số lượng");
+//       const data = await res.json();
+//       setCart({ items: data.items || [] });
+//       window.dispatchEvent(new Event("cart-updated"));
+//     } catch {
+//       fetchCart();
+//     } finally {
+//       setUpdatingId(null);
+//     }
+//   };
+
+//   // Xóa 1 sản phẩm khỏi giỏ (dùng chung logic với trang /cart)
+//   const handleRemoveItem = async (
+//     itemId: string,
+//     productId: string,
+//     variantId: string | undefined,
+//   ) => {
+//     const userId = reduxUser?.id || getUserId();
+//     setUpdatingId(itemId);
+//     const prevItems = cart.items;
+
+//     setCart((prev) => ({
+//       items: prev.items.filter((item) => item._id !== itemId),
+//     }));
+
+//     try {
+//       const res = await fetch(
+//         `${process.env.NEXT_PUBLIC_API_URL}/api/cart/remove`,
+//         {
+//           method: "POST",
+//           headers: { "Content-Type": "application/json" },
+//           credentials: "include",
+//           body: JSON.stringify({ userId, productId, variantId }),
+//         },
+//       );
+//       if (!res.ok) throw new Error("Không thể xóa sản phẩm");
+//       const data = await res.json();
+//       setCart({ items: data.items || [] });
+//       window.dispatchEvent(new Event("cart-updated"));
+//     } catch {
+//       setCart({ items: prevItems });
+//     } finally {
+//       setUpdatingId(null);
+//     }
+//   };
 
 //   return (
 //     <>
@@ -234,7 +311,7 @@
 //               size={18}
 //               strokeWidth={1.75}
 //               className="cursor-pointer text-gray-700 hover:text-gray-500"
-//               onClick={() => router.push("/cart")}
+//               onClick={() => setIsCartOpen(true)}
 //             />
 //             {cartCount > 0 && (
 //               <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px]">
@@ -278,6 +355,16 @@
 //           </div>
 //         ))}
 //       </nav>
+
+//       {/* Drawer giỏ hàng */}
+//       <CartDrawer
+//         open={isCartOpen}
+//         onClose={() => setIsCartOpen(false)}
+//         items={cart.items}
+//         updatingId={updatingId}
+//         onUpdateQuantity={handleUpdateQuantity}
+//         onRemoveItem={handleRemoveItem}
+//       />
 //     </>
 //   );
 // };
@@ -285,17 +372,14 @@
 // export default Header;
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, ShoppingBag, User, ChevronDown, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useRouter } from "next/navigation";
-import CartDrawer, { CartItem } from "./Cartdrawer";
-
-interface CartType {
-  items: CartItem[];
-}
+import CartDrawer from "./Cartdrawer";
+import { useCart } from "@/contexts/CartContext";
 
 interface SubMenuItem {
   label: string;
@@ -344,54 +428,17 @@ const navItems: NavItem[] = [
 ];
 
 const Header = () => {
-  const [cart, setCart] = useState<CartType>({ items: [] });
   const [loggedInUser, setLoggedInUser] = useState<{
     id?: string;
     name?: string;
   } | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const router = useRouter();
   const reduxUser = useSelector((state: RootState) => state.auth.user);
 
-  // ✅ Dùng ĐÚNG hàm getUserId y hệt ProductDetail / ProductsPage
-  // để đảm bảo cùng 1 userId/guestId khi thêm giỏ hàng và khi đếm số lượng
-  const getUserId = () => {
-    if (typeof window !== "undefined") {
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        const userData = JSON.parse(storedUser);
-        if (userData?.id) return userData.id;
-      }
-      let guestId = localStorage.getItem("guestId");
-      if (!guestId) {
-        guestId = crypto.randomUUID();
-        localStorage.setItem("guestId", guestId);
-      }
-      return guestId;
-    }
-    return "";
-  };
-
-  const fetchCart = useCallback(async () => {
-    const userId = reduxUser?.id || getUserId();
-    if (!userId) return;
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/cart/${userId}`,
-        {
-          credentials: "include",
-        },
-      );
-      if (!res.ok) throw new Error("Failed to fetch cart");
-      const data = await res.json();
-      setCart({ items: data.items || [] });
-    } catch {
-      setCart({ items: [] });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduxUser]);
+  // ✅ Lấy cartItems trực tiếp từ CartContext — cùng nguồn dữ liệu với CartDrawer
+  const { cartItems } = useCart();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -404,17 +451,6 @@ const Header = () => {
         setLoggedInUser(null);
       }
     }
-    fetchCart();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduxUser]);
-
-  // Lắng nghe sự kiện cập nhật giỏ hàng — bắn ra từ ProductsPage/ProductDetail
-  // sau khi gọi API /api/cart/add thành công
-  useEffect(() => {
-    const handler = () => fetchCart();
-    window.addEventListener("cart-updated", handler);
-    return () => window.removeEventListener("cart-updated", handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduxUser]);
 
   // Khoá scroll nền khi menu mobile hoặc giỏ hàng đang mở
@@ -422,88 +458,10 @@ const Header = () => {
     document.body.style.overflow = isMenuOpen || isCartOpen ? "hidden" : "auto";
   }, [isMenuOpen, isCartOpen]);
 
-  const cartCount = cart.items.reduce(
+  const cartCount = cartItems.reduce(
     (sum, item) => sum + (item.quantity || 0),
     0,
   );
-
-  // Cập nhật số lượng 1 sản phẩm trong giỏ (dùng chung logic với trang /cart)
-  const handleUpdateQuantity = async (
-    itemId: string,
-    productId: string,
-    variantId: string | undefined,
-    newQuantity: number,
-  ) => {
-    if (newQuantity < 1) return;
-    const userId = reduxUser?.id || getUserId();
-    setUpdatingId(itemId);
-
-    setCart((prev) => ({
-      items: prev.items.map((item) =>
-        item._id === itemId ? { ...item, quantity: newQuantity } : item,
-      ),
-    }));
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/cart/update`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({
-            userId,
-            productId,
-            variantId,
-            quantity: newQuantity,
-          }),
-        },
-      );
-      if (!res.ok) throw new Error("Không thể cập nhật số lượng");
-      const data = await res.json();
-      setCart({ items: data.items || [] });
-      window.dispatchEvent(new Event("cart-updated"));
-    } catch {
-      fetchCart();
-    } finally {
-      setUpdatingId(null);
-    }
-  };
-
-  // Xóa 1 sản phẩm khỏi giỏ (dùng chung logic với trang /cart)
-  const handleRemoveItem = async (
-    itemId: string,
-    productId: string,
-    variantId: string | undefined,
-  ) => {
-    const userId = reduxUser?.id || getUserId();
-    setUpdatingId(itemId);
-    const prevItems = cart.items;
-
-    setCart((prev) => ({
-      items: prev.items.filter((item) => item._id !== itemId),
-    }));
-
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/cart/remove`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ userId, productId, variantId }),
-        },
-      );
-      if (!res.ok) throw new Error("Không thể xóa sản phẩm");
-      const data = await res.json();
-      setCart({ items: data.items || [] });
-      window.dispatchEvent(new Event("cart-updated"));
-    } catch {
-      setCart({ items: prevItems });
-    } finally {
-      setUpdatingId(null);
-    }
-  };
 
   return (
     <>
@@ -641,15 +599,8 @@ const Header = () => {
         ))}
       </nav>
 
-      {/* Drawer giỏ hàng */}
-      <CartDrawer
-        open={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cart.items}
-        updatingId={updatingId}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-      />
+      {/* Drawer giỏ hàng — chỉ cần open/onClose, tự lấy data từ CartContext */}
+      <CartDrawer open={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 };
