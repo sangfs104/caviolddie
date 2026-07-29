@@ -4,11 +4,9 @@ import Link from "next/link";
 import { useState } from "react";
 
 const Footer = () => {
-  // ==================== ĐĂNG KÝ NHẬN TIN ====================
   const [email, setEmail] = useState("");
-  const [newsletterStatus, setNewsletterStatus] = useState
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+  const [newsletterStatus, setNewsletterStatus] = useState;
+  "idle" | "loading" | "success" | ("error" > "idle");
   const [newsletterError, setNewsletterError] = useState("");
 
   const handleSubscribe = async (e: React.FormEvent) => {
@@ -35,12 +33,11 @@ const Footer = () => {
     } catch (err: unknown) {
       setNewsletterStatus("error");
       setNewsletterError(
-        err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại"
+        err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại",
       );
     }
   };
 
-  // ==================== LIÊN HỆ / HỎI ĐÁP ====================
   const [showContactForm, setShowContactForm] = useState(false);
   const [contactForm, setContactForm] = useState({
     name: "",
@@ -48,13 +45,12 @@ const Footer = () => {
     phone: "",
     message: "",
   });
-  const [contactStatus, setContactStatus] = useState
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+  const [contactStatus, setContactStatus] = useState;
+  "idle" | "loading" | "success" | ("error" > "idle");
   const [contactError, setContactError] = useState("");
 
   const handleContactChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setContactForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     if (contactStatus !== "idle") setContactStatus("idle");
@@ -89,7 +85,7 @@ const Footer = () => {
     } catch (err: unknown) {
       setContactStatus("error");
       setContactError(
-        err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại"
+        err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại",
       );
     }
   };
@@ -97,20 +93,18 @@ const Footer = () => {
   return (
     <footer className="border-t border-black bg-white px-6 sm:px-8 py-8">
       <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
-        {/* ==================== BẢN QUYỀN ==================== */}
         <div className="md:max-w-xs">
           <p className="text-sm text-gray-500">
-            © 2026, CAVIOLDDIE —{" "}
+            {"\u00A9"} 2026, CAVIOLDDIE {"\u2014"}{" "}
             <Link href="/privacy-policy" className="underline text-gray-500">
               Privacy policy
             </Link>
           </p>
         </div>
 
-        {/* ==================== ĐĂNG KÝ NHẬN TIN ==================== */}
         <div className="md:max-w-sm md:flex-1">
           <span className="block text-[11px] font-medium tracking-widest uppercase text-gray-400 mb-2">
-            Đăng ký nhận tin
+            Dang ky nhan tin
           </span>
 
           <form
@@ -125,7 +119,7 @@ const Footer = () => {
                 setEmail(e.target.value);
                 if (newsletterStatus !== "idle") setNewsletterStatus("idle");
               }}
-              placeholder="Nhập email của bạn"
+              placeholder="Nhap email cua ban"
               aria-label="Email"
               className="flex-1 min-w-0 px-3 py-2 text-sm outline-none placeholder:text-gray-400"
             />
@@ -134,14 +128,14 @@ const Footer = () => {
               disabled={newsletterStatus === "loading"}
               className="shrink-0 px-4 py-2 text-xs font-semibold uppercase tracking-wide bg-black text-white hover:bg-gray-800 transition-colors disabled:opacity-50"
             >
-              {newsletterStatus === "loading" ? "Đang gửi..." : "Gửi"}
+              {newsletterStatus === "loading" ? "Dang gui..." : "Gui"}
             </button>
           </form>
 
           <div className="mt-1.5 h-4">
             {newsletterStatus === "success" && (
               <p className="text-xs text-green-600">
-                Đăng ký thành công, cảm ơn bạn!
+                Dang ky thanh cong, cam on ban!
               </p>
             )}
             {newsletterStatus === "error" && (
@@ -149,14 +143,13 @@ const Footer = () => {
             )}
           </div>
 
-          {/* ==================== LIÊN HỆ / HỎI ĐÁP ==================== */}
           <div className="mt-5">
             <button
               type="button"
               onClick={() => setShowContactForm((prev) => !prev)}
               className="text-[11px] font-medium tracking-widest uppercase text-gray-400 hover:text-gray-700 transition-colors underline"
             >
-              {showContactForm ? "Đóng liên hệ" : "Liên hệ / Hỏi đáp"}
+              {showContactForm ? "Dong lien he" : "Lien he / Hoi dap"}
             </button>
 
             {showContactForm && (
@@ -168,7 +161,7 @@ const Footer = () => {
                   type="text"
                   name="name"
                   required
-                  placeholder="Họ tên"
+                  placeholder="Ho ten"
                   value={contactForm.name}
                   onChange={handleContactChange}
                   className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black placeholder:text-gray-400"
@@ -185,7 +178,7 @@ const Footer = () => {
                 <input
                   type="tel"
                   name="phone"
-                  placeholder="Số điện thoại (không bắt buộc)"
+                  placeholder="So dien thoai (khong bat buoc)"
                   value={contactForm.phone}
                   onChange={handleContactChange}
                   className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black placeholder:text-gray-400"
@@ -194,7 +187,7 @@ const Footer = () => {
                   name="message"
                   required
                   rows={3}
-                  placeholder="Nội dung cần hỏi..."
+                  placeholder="Noi dung can hoi..."
                   value={contactForm.message}
                   onChange={handleContactChange}
                   className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black resize-none placeholder:text-gray-400"
@@ -204,12 +197,12 @@ const Footer = () => {
                   disabled={contactStatus === "loading"}
                   className="w-full bg-black text-white py-2 text-xs font-semibold uppercase tracking-wide hover:bg-gray-800 transition-colors disabled:opacity-50"
                 >
-                  {contactStatus === "loading" ? "Đang gửi..." : "Gửi liên hệ"}
+                  {contactStatus === "loading" ? "Dang gui..." : "Gui lien he"}
                 </button>
 
                 {contactStatus === "success" && (
                   <p className="text-xs text-green-600">
-                    Gửi thành công! Chúng tôi sẽ phản hồi sớm nhất.
+                    Gui thanh cong! Chung toi se phan hoi som nhat.
                   </p>
                 )}
                 {contactStatus === "error" && (
@@ -220,13 +213,12 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* ==================== MẠNG XÃ HỘI ==================== */}
         <div className="flex flex-col items-start md:items-end gap-2">
           <span className="text-[11px] font-medium tracking-widest uppercase text-gray-400">
             Find us on
           </span>
           <div className="flex gap-2">
-            
+            <Link
               href="https://www.facebook.com"
               target="_blank"
               rel="noopener noreferrer"
@@ -236,8 +228,8 @@ const Footer = () => {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
               </svg>
-            </a>
-            
+            </Link>
+            <Link
               href="https://www.instagram.com"
               target="_blank"
               rel="noopener noreferrer"
@@ -262,8 +254,8 @@ const Footer = () => {
                 <circle cx="12" cy="12" r="4" />
                 <circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none" />
               </svg>
-            </a>
-            
+            </Link>
+            <Link
               href="https://www.tiktok.com"
               target="_blank"
               rel="noopener noreferrer"
@@ -273,7 +265,7 @@ const Footer = () => {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
                 <path d="M16.5 2h-3.2v13.6c0 1.4-1.1 2.5-2.5 2.5s-2.5-1.1-2.5-2.5 1.1-2.5 2.5-2.5c.3 0 .6.05.9.14V9.9c-.3-.04-.6-.06-.9-.06-3 0-5.4 2.4-5.4 5.4S8.3 20.7 11.3 20.7s5.4-2.4 5.4-5.4V8.4c1.1.8 2.4 1.3 3.9 1.3V6.5c-1.9 0-3.5-1.4-3.9-3.2-.1-.4-.2-.9-.2-1.3z" />
               </svg>
-            </a>
+            </Link>
           </div>
         </div>
       </div>
