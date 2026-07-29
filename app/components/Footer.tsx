@@ -4,18 +4,19 @@ import Link from "next/link";
 import { useState } from "react";
 
 const Footer = () => {
+  // ==================== ĐĂNG KÝ NHẬN TIN ====================
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<
+  const [newsletterStatus, setNewsletterStatus] = useState
     "idle" | "loading" | "success" | "error"
   >("idle");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [newsletterError, setNewsletterError] = useState("");
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
 
-    setStatus("loading");
-    setErrorMessage("");
+    setNewsletterStatus("loading");
+    setNewsletterError("");
 
     try {
       const res = await fetch("/api/newsletter", {
@@ -29,11 +30,65 @@ const Footer = () => {
         throw new Error(data?.error || "Gửi thất bại");
       }
 
-      setStatus("success");
+      setNewsletterStatus("success");
       setEmail("");
     } catch (err: unknown) {
-      setStatus("error");
-      setErrorMessage(
+      setNewsletterStatus("error");
+      setNewsletterError(
+        err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại",
+      );
+    }
+  };
+
+  // ==================== LIÊN HỆ / HỎI ĐÁP ====================
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [contactForm, setContactForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: "",
+  });
+  const [contactStatus, setContactStatus] = useState
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+  const [contactError, setContactError] = useState("");
+
+  const handleContactChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    setContactForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    if (contactStatus !== "idle") setContactStatus("idle");
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      !contactForm.name.trim() ||
+      !contactForm.email.trim() ||
+      !contactForm.message.trim()
+    )
+      return;
+
+    setContactStatus("loading");
+    setContactError("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(contactForm),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data?.error || "Gửi thất bại");
+      }
+
+      setContactStatus("success");
+      setContactForm({ name: "", email: "", phone: "", message: "" });
+    } catch (err: unknown) {
+      setContactStatus("error");
+      setContactError(
         err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại",
       );
     }
@@ -67,7 +122,7 @@ const Footer = () => {
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
-                if (status !== "idle") setStatus("idle");
+                if (newsletterStatus !== "idle") setNewsletterStatus("idle");
               }}
               placeholder="Nhập email của bạn"
               aria-label="Email"
@@ -75,20 +130,90 @@ const Footer = () => {
             />
             <button
               type="submit"
-              disabled={status === "loading"}
+              disabled={newsletterStatus === "loading"}
               className="shrink-0 px-4 py-2 text-xs font-semibold uppercase tracking-wide bg-black text-white hover:bg-gray-800 transition-colors disabled:opacity-50"
             >
-              {status === "loading" ? "Đang gửi..." : "Gửi"}
+              {newsletterStatus === "loading" ? "Đang gửi..." : "Gửi"}
             </button>
           </form>
           <div className="mt-1.5 h-4">
-            {status === "success" && (
+            {newsletterStatus === "success" && (
               <p className="text-xs text-green-600">
                 Đăng ký thành công, cảm ơn bạn!
               </p>
             )}
-            {status === "error" && (
-              <p className="text-xs text-red-600">{errorMessage}</p>
+            {newsletterStatus === "error" && (
+              <p className="text-xs text-red-600">{newsletterError}</p>
+            )}
+          </div>
+
+          {/* ==================== LIÊN HỆ / HỎI ĐÁP ==================== */}
+          <div className="mt-5">
+            <button
+              type="button"
+              onClick={() => setShowContactForm((prev) => !prev)}
+              className="text-[11px] font-medium tracking-widest uppercase text-gray-400 hover:text-gray-700 transition-colors underline"
+            >
+              {showContactForm ? "Đóng liên hệ" : "Liên hệ / Hỏi đáp"}
+            </button>
+
+            {showContactForm && (
+              <form
+                onSubmit={handleContactSubmit}
+                className="mt-3 space-y-2 border border-gray-200 p-4"
+              >
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  placeholder="Họ tên"
+                  value={contactForm.name}
+                  onChange={handleContactChange}
+                  className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black placeholder:text-gray-400"
+                />
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="Email"
+                  value={contactForm.email}
+                  onChange={handleContactChange}
+                  className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black placeholder:text-gray-400"
+                />
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Số điện thoại (không bắt buộc)"
+                  value={contactForm.phone}
+                  onChange={handleContactChange}
+                  className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black placeholder:text-gray-400"
+                />
+                <textarea
+                  name="message"
+                  required
+                  rows={3}
+                  placeholder="Nội dung cần hỏi..."
+                  value={contactForm.message}
+                  onChange={handleContactChange}
+                  className="w-full border border-gray-300 px-3 py-2 text-sm outline-none focus:border-black resize-none placeholder:text-gray-400"
+                />
+                <button
+                  type="submit"
+                  disabled={contactStatus === "loading"}
+                  className="w-full bg-black text-white py-2 text-xs font-semibold uppercase tracking-wide hover:bg-gray-800 transition-colors disabled:opacity-50"
+                >
+                  {contactStatus === "loading" ? "Đang gửi..." : "Gửi liên hệ"}
+                </button>
+
+                {contactStatus === "success" && (
+                  <p className="text-xs text-green-600">
+                    Gửi thành công! Chúng tôi sẽ phản hồi sớm nhất.
+                  </p>
+                )}
+                {contactStatus === "error" && (
+                  <p className="text-xs text-red-600">{contactError}</p>
+                )}
+              </form>
             )}
           </div>
         </div>
@@ -99,7 +224,7 @@ const Footer = () => {
             Find us on
           </span>
           <div className="flex gap-2">
-            <a
+            
               href="https://www.facebook.com"
               target="_blank"
               rel="noopener noreferrer"
@@ -110,7 +235,7 @@ const Footer = () => {
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
               </svg>
             </a>
-            <a
+            
               href="https://www.instagram.com"
               target="_blank"
               rel="noopener noreferrer"
@@ -136,7 +261,7 @@ const Footer = () => {
                 <circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none" />
               </svg>
             </a>
-            <a
+            
               href="https://www.tiktok.com"
               target="_blank"
               rel="noopener noreferrer"
