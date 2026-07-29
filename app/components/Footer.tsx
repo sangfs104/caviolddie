@@ -35,7 +35,7 @@ const Footer = () => {
     } catch (err: unknown) {
       setNewsletterStatus("error");
       setNewsletterError(
-        err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại",
+        err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại"
       );
     }
   };
@@ -54,7 +54,7 @@ const Footer = () => {
   const [contactError, setContactError] = useState("");
 
   const handleContactChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setContactForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     if (contactStatus !== "idle") setContactStatus("idle");
@@ -89,7 +89,7 @@ const Footer = () => {
     } catch (err: unknown) {
       setContactStatus("error");
       setContactError(
-        err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại",
+        err instanceof Error ? err.message : "Có lỗi xảy ra, vui lòng thử lại"
       );
     }
   };
@@ -112,6 +112,7 @@ const Footer = () => {
           <span className="block text-[11px] font-medium tracking-widest uppercase text-gray-400 mb-2">
             Đăng ký nhận tin
           </span>
+
           <form
             onSubmit={handleSubscribe}
             className="flex items-stretch border border-black"
@@ -136,6 +137,7 @@ const Footer = () => {
               {newsletterStatus === "loading" ? "Đang gửi..." : "Gửi"}
             </button>
           </form>
+
           <div className="mt-1.5 h-4">
             {newsletterStatus === "success" && (
               <p className="text-xs text-green-600">
