@@ -478,7 +478,7 @@ export default function ProductsPage() {
   }
 
   return (
-    <main className="px-4 sm:px-8 md:px-12 py-10">
+    <main className="px-8 sm:px-8 md:px-12 py-10 pb-24">
       {error && (
         <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm">
           {error}
