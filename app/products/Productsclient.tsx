@@ -412,7 +412,19 @@ export default function ProductsClient({
         if (!res.ok) throw new Error("Không thể tải giỏ hàng");
 
         const data = await res.json();
+
         data.items?.forEach((item: any) => {
+          // ✅ FIX: product có thể là null nếu đã bị xóa khỏi DB
+          // (cart item "mồ côi" do product gốc bị xóa). Bỏ qua item
+          // này thay vì crash khi đọc item.product.images.
+          if (!item?.product) {
+            console.warn(
+              "Bỏ qua cart item có sản phẩm không còn tồn tại:",
+              item,
+            );
+            return;
+          }
+
           dispatch(
             addToCart({
               product: {

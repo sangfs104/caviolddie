@@ -1026,6 +1026,7 @@
 //     </main>
 //   );
 // }
+
 import ProductsClient from "./Productsclient";
 import type { ApiProduct } from "./types";
 
